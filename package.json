@@ -1,0 +1,25 @@
+{
+  "name": "ptac",
+  "version": "1.0.0",
+  "description": "Penetration Test as Code (PTaC)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zvonimir Susac (susac.zvonimir@gmail.com)",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0"
+  },
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "shelljs": "^0.8.3",
+    "strip-ansi": "^5.2.0",
+    "xml2js": "^0.4.19"
+  }
+}
