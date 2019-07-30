@@ -6,6 +6,7 @@ const whatweb = require('../tools/whatweb')
 const sublist3r = require('../tools/sublist3r')
 const wpscan = require('../tools/wpscan')
 const droopescan = require('../tools/droopescan')
+const waybackurls = require('../tools/waybackurls')
 const fileUtility = require('../utilities/file')
 
 const startingDirectory = process.cwd()
@@ -33,6 +34,11 @@ for (let i = 0; i < subdomains.length; i++) {
   parseString(nmapXML, function (_err, result) {
     const jsonString = JSON.stringify(result)
     fileUtility.writeToFile(nmapJSONFilename, jsonString)
+  })
+
+  // Run waybackurls tool
+  waybackurls.run(subdomain).then(function (response) {
+    fileUtility.writeToFile(`${startingDirectory}/${subdomain}/waybackurls_${subdomain}.json`, response)
   })
 
   for (let j = 0; j < httpServicePorts.length; j++) {
