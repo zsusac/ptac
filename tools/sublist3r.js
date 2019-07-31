@@ -1,31 +1,39 @@
 const shelljs = require('shelljs')
 const stripAnsi = require('strip-ansi')
 const logger = require('../utilities/logger')
+const command = require('../utilities/command')
+const config = require('../config/tools.json')
 
 /**
  * Penetration Test as Code (PTaC) sublist3r wrapper.
  */
 let sublist3r = (function () {
   /**
+   * Command name.
+   */
+  const commandName = 'sublist3r'
+
+  /**
    * Run sublist3r command.
    *
-   * @param {*} options
-   * @param {*} url
+   * @param {string} options
+   * @param {string} url
    *
    * @return {string} Command output
    */
   const run = (options, url) => {
-    logger.info('Starting sublist3r command...')
-    return shelljs.exec(`sublist3r ${options} -d ${url}`, {
-      silent: false
+    command.exitIfNotInstalled(commandName)
+    logger.info(`Starting ${commandName} command...`)
+    return shelljs.exec(`${commandName} ${options} -d ${url}`, {
+      silent: config.silent
     }).stdout
   }
 
   /**
    * Get subdomains.
    *
-   * @param {*} options
-   * @param {*} url
+   * @param {string} options
+   * @param {string} url
    *
    * @return {Array.<String>} Array of subdomains
    */

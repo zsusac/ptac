@@ -1,22 +1,30 @@
 const shelljs = require('shelljs')
 const logger = require('../utilities/logger')
+const command = require('../utilities/command')
+const config = require('../config/tools.json')
 
 /**
  * Penetration Test as Code (PTaC) droopescan wrapper.
  */
 let droopescan = (function () {
   /**
+   * Command name.
+   */
+  const commandName = 'droopescan'
+
+  /**
    * Run droopescan command.
    *
-   * @param {*} options
-   * @param {*} url
+   * @param {string} options
+   * @param {string} url
    *
    * @return {string} Command output
    */
   const run = (options, url) => {
-    logger.info('Starting droopescan command...')
-    return shelljs.exec(`droopescan ${options} -u ${url}`, {
-      silent: false
+    command.exitIfNotInstalled(commandName)
+    logger.info(`Starting ${commandName} command...`)
+    return shelljs.exec(`${commandName} ${options} -u ${url}`, {
+      silent: config.silent
     }).stdout
   }
 

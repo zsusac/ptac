@@ -27,7 +27,7 @@ for (let i = 0; i < subdomains.length; i++) {
   // Scan with nmap
   let nmapXMLFilename = `nmap_${subdomain}.xml`
   let nmapJSONFilename = `nmap_${subdomain}.json`
-  let httpServicePorts = nmap.getHTTPServicePorts(`-oX ${nmapXMLFilename}`, subdomain)
+  nmap.run(`-oX ${nmapXMLFilename}`, subdomain)
 
   // Convert xml to json
   var nmapXML = fs.readFileSync(`${nmapXMLFilename}`, 'utf8')
@@ -41,40 +41,36 @@ for (let i = 0; i < subdomains.length; i++) {
     fileUtility.writeToFile(`${startingDirectory}/${subdomain}/waybackurls_${subdomain}.json`, response)
   })
 
-  for (let j = 0; j < httpServicePorts.length; j++) {
-    let scheme = httpServicePorts[j] === 443 ? 'https://' : 'http://'
+  // Scan with whatweb
+  let whatwebResult = whatweb.run(`--log-json=whatweb_${subdomain}.json`, `${subdomain}`)
 
-    // Scan with whatweb
-    let whatwebResult = whatweb.run(`--log-json=whatweb_${subdomain}_${httpServicePorts[j]}.json --url-prefix ${scheme}`, `${subdomain}:${httpServicePorts[j]}`)
+  // Scan with wpscan
+  if (whatwebResult.includes('WordPress')) {
+    wpscan.run(`-o wpscan_${subdomain}.json -f json`, `${subdomain}`)
+  }
 
-    // Scan with wpscan
-    if (whatwebResult.includes('WordPress')) {
-      wpscan.run(`-o wpscan_${subdomain}_${httpServicePorts[j]}.json -f json`, `${scheme}${subdomain}:${httpServicePorts[j]}`)
-    }
+  let droopescanResult = ''
+  // Scan drupal site with droopescan
+  if (whatwebResult.includes('Drupal')) {
+    droopescanResult = droopescan.run(`scan drupal -o json`, `${subdomain}`)
+    fileUtility.writeToFile(`droopescan_drupal_${subdomain}.json`, droopescanResult)
+  }
 
-    let droopescanResult = ''
-    // Scan drupal site with droopescan
-    if (whatwebResult.includes('Drupal')) {
-      droopescanResult = droopescan.run(`scan drupal -o json`, `${scheme}${subdomain}:${httpServicePorts[j]}`)
-      fileUtility.writeToFile(`droopescan_drupal_${subdomain}.json`, droopescanResult)
-    }
+  // Scan joomla site with droopescan
+  if (whatwebResult.includes('Joomla')) {
+    droopescanResult = droopescan.run(`scan joomla -o json`, `${subdomain}`)
+    fileUtility.writeToFile(`droopescan_joomla_${subdomain}.json`, droopescanResult)
+  }
 
-    // Scan joomla site with droopescan
-    if (whatwebResult.includes('Joomla')) {
-      droopescanResult = droopescan.run(`scan joomla -o json`, `${scheme}${subdomain}:${httpServicePorts[j]}`)
-      fileUtility.writeToFile(`droopescan_joomla_${subdomain}.json`, droopescanResult)
-    }
+  // Scan moodle site with droopescan
+  if (whatwebResult.includes('Moodle')) {
+    droopescanResult = droopescan.run(`scan moodle -o json`, `${subdomain}`)
+    fileUtility.writeToFile(`droopescan_moodle_${subdomain}.json`, droopescanResult)
+  }
 
-    // Scan moodle site with droopescan
-    if (whatwebResult.includes('Moodle')) {
-      droopescanResult = droopescan.run(`scan moodle -o json`, `${scheme}${subdomain}:${httpServicePorts[j]}`)
-      fileUtility.writeToFile(`droopescan_moodle_${subdomain}.json`, droopescanResult)
-    }
-
-    // Scan silverstripe site with droopescan
-    if (whatwebResult.includes('Silverstripe')) {
-      droopescanResult = droopescan.run(`scan silverstripe -o json`, `${scheme}${subdomain}:${httpServicePorts[j]}`)
-      fileUtility.writeToFile(`droopescan_silverstripe_${subdomain}.json`, droopescanResult)
-    }
+  // Scan silverstripe site with droopescan
+  if (whatwebResult.includes('Silverstripe')) {
+    droopescanResult = droopescan.run(`scan silverstripe -o json`, `${subdomain}`)
+    fileUtility.writeToFile(`droopescan_silverstripe_${subdomain}.json`, droopescanResult)
   }
 }

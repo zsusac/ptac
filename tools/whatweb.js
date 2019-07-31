@@ -1,30 +1,38 @@
 const shelljs = require('shelljs')
 const logger = require('../utilities/logger')
+const command = require('../utilities/command')
+const config = require('../config/tools.json')
 
 /**
  * Penetration Test as Code (PTaC) whatweb wrapper.
  */
 let whatweb = (function () {
   /**
+   * Command name.
+   */
+  const commandName = 'whatweb'
+
+  /**
    * Run whatweb command.
    *
-   * @param {*} options
-   * @param {*} urls
+   * @param {string} options
+   * @param {string} urls
    *
    * @return {string} Command output
    */
   const run = (options, urls) => {
-    logger.info('Starting whatweb command...')
-    return shelljs.exec(`whatweb ${options} ${urls}`, {
-      silent: false
+    command.exitIfNotInstalled(commandName)
+    logger.info(`Starting ${commandName} command...`)
+    return shelljs.exec(`${commandName} ${options} ${urls}`, {
+      silent: config.silent
     }).stdout
   }
 
   /**
    * Check if website is Drupal CMS.
    *
-   * @param {*} options
-   * @param {*} urls
+   * @param {string} options
+   * @param {string} urls
    *
    * @return {bool}
    */
@@ -39,8 +47,8 @@ let whatweb = (function () {
   /**
    * Check if website is WordPress CMS.
    *
-   * @param {*} options
-   * @param {*} urls
+   * @param {string} options
+   * @param {string} urls
    *
    * @return {bool}
    */

@@ -1,10 +1,17 @@
 const shelljs = require('shelljs')
 const logger = require('../utilities/logger')
+const command = require('../utilities/command')
+const config = require('../config/tools.json')
 
 /**
  * Penetration Test as Code (PTaC) nmap wrapper.
  */
 let nmap = (function () {
+  /**
+   * Command name.
+   */
+  const commandName = 'nmap'
+
   /**
    * Run nmap command.
    *
@@ -14,9 +21,11 @@ let nmap = (function () {
    * @return {string} Command output
    */
   const run = (options, target) => {
-    logger.info('Starting nmap command...')
-    return shelljs.exec(`nmap ${options} ${target}`, {
-      silent: false
+    command.exitIfNotInstalled(commandName)
+
+    logger.info(`Starting ${commandName} command...`)
+    return shelljs.exec(`${commandName} ${options} ${target}`, {
+      silent: config.silent
     }).stdout
   }
 
