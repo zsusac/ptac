@@ -12,7 +12,7 @@ let file = (function () {
    * @param {String} content
    *
    */
-  const writeToFile = function (fileName, content) {
+  const writeToFile = (fileName, content) => {
     logger.info(`Start writing to ${fileName} file`)
     fs.writeFile(fileName, content, function (error) {
       if (error) {
@@ -21,8 +21,20 @@ let file = (function () {
     })
   }
 
+  /**
+   * Return file content as string.
+   *
+   * @param {*} file
+   * @param {*} encoding
+   */
+  const fileToString = (file, encoding) => {
+    logger.info(`Start reading ${file} file`)
+    return fs.readFileSync(file, encoding)
+  }
+
   return {
-    writeToFile: writeToFile
+    writeToFile: writeToFile,
+    fileToString: fileToString
   }
 })()
 

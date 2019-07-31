@@ -16,15 +16,55 @@ let whatweb = (function () {
    * Run whatweb command.
    *
    * @param {string} options
-   * @param {string} urls
+   * @param {string} url
+   * @param {function} callback
    *
    * @return {string} Command output
    */
-  const run = (options, urls) => {
+  const run = (options, url, callback) => {
     command.exitIfNotInstalled(commandName)
     logger.info(`Starting ${commandName} command...`)
-    return shelljs.exec(`${commandName} ${options} ${urls}`, {
+    if (callback) {
+      runAsync(options, url, callback)
+    } else {
+      runSync(options, url)
+    }
+  }
+
+  /**
+   * Run whatweb command synchronously.
+   *
+   * @param {string} options
+   * @param {string} url
+   *
+   * @return {string} Command output
+   */
+  const runSync = (options, url) => {
+    return shelljs.exec(`${commandName} ${options} ${url}`, {
       silent: config.silent
+    }).stdout
+  }
+
+  /**
+   * Run whatweb command asynchronously.
+   *
+   * @param {string} options
+   * @param {string} url
+   * @param {function} callback
+   *
+   * @return {string} Command output
+   */
+  const runAsync = (options, url, callback) => {
+    return shelljs.exec(`${commandName} ${options} ${url}`, {
+      silent: config.silent,
+      async: true
+    }, (code, stdout, stderr) => {
+      if (stderr) {
+        logger.error(`whatweb: ${stderr}`)
+        shelljs.exit(1)
+      }
+      logger.info(`Finished ${commandName} command...`)
+      callback()
     }).stdout
   }
 
@@ -36,8 +76,8 @@ let whatweb = (function () {
    *
    * @return {bool}
    */
-  const isDrupal = (options, urls) => {
-    var result = whatweb.run(options, urls)
+  const isDrupal = (options, urls, callback) => {
+    var result = whatweb.run(options, urls, callback)
     if (result.includes('Drupal')) {
       return true
     }
@@ -52,8 +92,8 @@ let whatweb = (function () {
    *
    * @return {bool}
    */
-  const isWordPress = (options, urls) => {
-    var result = whatweb.run(options, urls)
+  const isWordPress = (options, urls, callback) => {
+    var result = whatweb.run(options, urls, callback)
     if (result.includes('WordPress')) {
       return true
     }
